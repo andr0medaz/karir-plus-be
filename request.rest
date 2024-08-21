@@ -1,0 +1,55 @@
+GET http://localhost:5000/employee?search_query=2&page=0&limit=10
+
+###
+GET http://localhost:5000/employee?page=0&limit=10
+
+###
+GET http://localhost:5000/api/employees/3/work-experience
+
+###
+GET  http://localhost:5000/api/6
+
+###
+PATCH http://localhost:5000/api/employee/update/2
+Content-Type: application/json 
+
+{
+    "nik": "2",
+    "name": "Test Update",
+    "tanggal_masuk": "2018-08-15",
+    "pangkat": "A3",
+    "jabatan": "Staff",
+    "academic_background": "SMP",
+    "nomor_telepon": "085566778899"
+}
+
+
+
+###
+POST http://localhost:5000/employee/create 
+Content-Type: application/json 
+
+{
+    "nik": "",
+    "name": "test5",
+    "tanggal_masuk": "2021-08-15",
+    "pangkat": "C1",
+    "jabatan": "Kasubag",
+    "academic_background": "S1 Hukum",
+    "nomor_telepon": "082233445511"
+}
+
+###
+POST http://localhost:5000/api/login
+Content-Type: application/json
+
+{
+    "username": "testuser10@gmail.com",
+    "password": "testpassword10"
+}
+
+
+###
+DELETE http://localhost:5000/api/employee/delete/8
+
+
