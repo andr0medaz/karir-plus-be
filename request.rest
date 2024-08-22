@@ -1,14 +1,18 @@
-GET http://localhost:5000/api/get-employee?search_query=2&page=0&limit=10
+GET http://localhost:5000/api/get-employee?search_query=c&page=0&limit=10
+
+### get v2
+GET http://localhost:5000/api/get-employee-v2?search_query=c&page=0&limit=10
+
 
 ###
-GET http://localhost:5000/api/get-employee?page=0&limit=10
+GET http://localhost:5000/api/get-employee-v2?page=0&limit=10
 
 
 ### get all data
 GET  http://localhost:5000/api/get-employee
 
 ### get all data v2
-GET http://localhost:5000/api/get-employe-v2
+GET http://localhost:5000/api/get-employee-v2
 
 ###
 PATCH http://localhost:5000/api/employee/edit/5

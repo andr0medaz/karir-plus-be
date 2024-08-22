@@ -234,40 +234,49 @@ export const getUsersV2 = async (req, res) => {
   const offset = limit * page;
 
   try {
-    // Dapatkan total karyawan yang cocok dengan kriteria pencarian
+    // Log the search query and pagination details
+    console.log("Search Query:", search);
+    console.log("Page:", page, "Limit:", limit, "Offset:", offset);
+
+    // Check if search is working properly
+    if (!search) {
+      console.log("No search query provided.");
+    }
+
+    // Get total count of employees matching the search criteria
     const totalRows = await employee.count({
       where: {
-        [Op.or]: [{ nik: { [Op.like]: "%" + search + "%" } }, { name: { [Op.like]: "%" + search + "%" } }],
+        [Op.or]: [{ nik: { [Op.like]: `%${search}%` } }, { name: { [Op.like]: `%${search}%` } }],
       },
     });
 
     const totalPage = Math.ceil(totalRows / limit);
 
-    // Ambil data karyawan dengan paginasi dan pencarian
+    // Fetch employees with pagination and search criteria
     const result = await employee.findAll({
       where: {
-        [Op.or]: [{ nik: { [Op.like]: "%" + search + "%" } }, { name: { [Op.like]: "%" + search + "%" } }],
+        [Op.or]: [{ nik: { [Op.like]: `%${search}%` } }, { name: { [Op.like]: `%${search}%` } }],
       },
       offset: offset,
       limit: limit,
       order: [["nik", "ASC"]],
     });
 
-    // Hitung tanggal promosi berikutnya setiap 4 tahun
-    const processedResults = result.map((employeeData) => {
-      const { tanggal_masuk, name, nik } = employeeData;
+    // Log the result to check if employees are being found
+    console.log("Result Count:", result.length);
 
+    // Process promotion date calculation
+    const processedResults = result.map((employeeData) => {
+      const { tanggal_masuk } = employeeData;
       const tanggalMasukDate = new Date(tanggal_masuk);
       const today = new Date();
 
-      // Hitung promosi 4 tahunan berikutnya
-      let yearsOfService = Math.floor((today - tanggalMasukDate) / (1000 * 60 * 60 * 24 * 365.25));
-      let nextPromotionDate = new Date(tanggalMasukDate);
-
-      // Cari siklus 4 tahun berikutnya
+      // Calculate next promotion date every 4 years
+      const yearsOfService = Math.floor((today - tanggalMasukDate) / (1000 * 60 * 60 * 24 * 365.25));
+      const nextPromotionDate = new Date(tanggalMasukDate);
       nextPromotionDate.setFullYear(tanggalMasukDate.getFullYear() + (Math.floor(yearsOfService / 4) + 1) * 4);
 
-      // Hitung hari ke promosi berikutnya
+      // Calculate days to the next promotion
       const daysToNextPromotion = Math.ceil((nextPromotionDate - today) / (1000 * 60 * 60 * 24));
 
       return {
@@ -277,7 +286,7 @@ export const getUsersV2 = async (req, res) => {
       };
     });
 
-    // Kirim data hasil dengan detail paginasi
+    // Send processed results and pagination details
     res.json({
       result: processedResults,
       page,
@@ -286,7 +295,7 @@ export const getUsersV2 = async (req, res) => {
       totalPage,
     });
   } catch (error) {
-    console.error(error.message);
+    console.error("Error in getUsersV2:", error.message);
     res.status(500).json({ message: "Error occurred while fetching employee data." });
   }
 };
