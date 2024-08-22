@@ -2,7 +2,6 @@ import employee from "../models/UserModel.js";
 import UserLogin from "../models/UserLogin.js";
 import { Op } from "sequelize";
 
-
 // untuk login
 // Simple login API endpoint
 export const login = async (req, res) => {
@@ -227,3 +226,68 @@ export const validateWorkExperienceTest2 = async (req, res) => {
     return res.status(500).json({ message: "Error occurred while fetching employee data." });
   }
 };
+
+export const getUsersV2 = async (req, res) => {
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search_query || "";
+  const offset = limit * page;
+
+  try {
+    // Dapatkan total karyawan yang cocok dengan kriteria pencarian
+    const totalRows = await employee.count({
+      where: {
+        [Op.or]: [{ nik: { [Op.like]: "%" + search + "%" } }, { name: { [Op.like]: "%" + search + "%" } }],
+      },
+    });
+
+    const totalPage = Math.ceil(totalRows / limit);
+
+    // Ambil data karyawan dengan paginasi dan pencarian
+    const result = await employee.findAll({
+      where: {
+        [Op.or]: [{ nik: { [Op.like]: "%" + search + "%" } }, { name: { [Op.like]: "%" + search + "%" } }],
+      },
+      offset: offset,
+      limit: limit,
+      order: [["nik", "ASC"]],
+    });
+
+    // Hitung tanggal promosi berikutnya setiap 4 tahun
+    const processedResults = result.map((employeeData) => {
+      const { tanggal_masuk, name, nik } = employeeData;
+
+      const tanggalMasukDate = new Date(tanggal_masuk);
+      const today = new Date();
+
+      // Hitung promosi 4 tahunan berikutnya
+      let yearsOfService = Math.floor((today - tanggalMasukDate) / (1000 * 60 * 60 * 24 * 365.25));
+      let nextPromotionDate = new Date(tanggalMasukDate);
+
+      // Cari siklus 4 tahun berikutnya
+      nextPromotionDate.setFullYear(tanggalMasukDate.getFullYear() + (Math.floor(yearsOfService / 4) + 1) * 4);
+
+      // Hitung hari ke promosi berikutnya
+      const daysToNextPromotion = Math.ceil((nextPromotionDate - today) / (1000 * 60 * 60 * 24));
+
+      return {
+        ...employeeData.toJSON(),
+        nextPromotionDate: nextPromotionDate.toISOString(),
+        daysToNextPromotion,
+      };
+    });
+
+    // Kirim data hasil dengan detail paginasi
+    res.json({
+      result: processedResults,
+      page,
+      limit,
+      totalRows,
+      totalPage,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: "Error occurred while fetching employee data." });
+  }
+};
+
