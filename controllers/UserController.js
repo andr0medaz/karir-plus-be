@@ -74,159 +74,6 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-export const getUsers = async (req, res) => {
-  const page = parseInt(req.query.page) || 0;
-  const limit = parseInt(req.query.limit) || 10;
-  const search = req.query.search_query || "";
-  const offset = limit * page;
-  const totalRows = await employee.count({
-    where: {
-      [Op.or]: [
-        {
-          nik: {
-            [Op.like]: "%" + search + "%",
-          },
-        },
-        {
-          name: {
-            [Op.like]: "%" + search + "%",
-          },
-        },
-      ],
-    },
-  });
-
-  const totalPage = Math.ceil(totalRows / limit);
-  const result = await employee.findAll({
-    where: {
-      [Op.or]: [
-        {
-          nik: {
-            [Op.like]: "%" + search + "%",
-          },
-        },
-        {
-          name: {
-            [Op.like]: "%" + search + "%",
-          },
-        },
-      ],
-    },
-
-    offset: offset,
-    limit: limit,
-    order: [["nik", "ASC"]],
-  });
-  res.json({
-    result: result,
-    page: page,
-    limit: limit,
-    totalRows: totalRows,
-    totalPage: totalPage,
-  });
-};
-
-export const validateWorkExperience = async (req, res) => {
-  const { nik } = req.params; // Assuming NIK (employee ID) is in request params
-
-  // Calculate the minimum required work start date (4 years ago)
-  const fourYearsAgo = new Date();
-  fourYearsAgo.setFullYear(fourYearsAgo.getFullYear() - 4);
-
-  try {
-    const employeeData = await employee.findOne({
-      where: {
-        nik,
-        tanggal_masuk: {
-          [Op.lte]: fourYearsAgo, // Check if start date is less than or equal to 4 years ago
-        },
-      },
-    });
-
-    if (employeeData) {
-      res.json({
-        message: "Employee with NIK " + nik + " has been working for at least 4 years.",
-        hasWorkedForFourYears: true,
-      });
-    } else {
-      res.json({
-        message: "Employee with NIK " + nik + " does not meet the 4-year work experience requirement.",
-        hasWorkedForFourYears: false,
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error occurred while fetching employee data." });
-  }
-};
-
-export const validateWorkExperienceTest2 = async (req, res) => {
-  const { nik } = req.params;
-
-  try {
-    const employeeData = await employee.findOne({
-      where: {
-        nik,
-      },
-    });
-
-    if (!employeeData) {
-      return res.json({
-        message: `Employee with NIK ${nik} not found.`,
-        hasWorkedForFourYears: false,
-      });
-    }
-
-    const { tanggal_masuk, name } = employeeData;
-
-    // Calculate the exact date for the current 4-year period
-    const currentFourYearsLater = new Date(tanggal_masuk);
-    currentFourYearsLater.setFullYear(currentFourYearsLater.getFullYear() + 4);
-
-    // Calculate the difference in milliseconds
-    const timeDifference = currentFourYearsLater - new Date();
-
-    // Convert milliseconds to days
-    const daysLeft = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-
-    if (daysLeft <= 0) {
-      // Calculate the next 4-year period
-      const nextPromotionDate = new Date(tanggal_masuk);
-      nextPromotionDate.setFullYear(nextPromotionDate.getFullYear() + 8);
-
-      // Format the date as a string
-      const formattedNextPromotionDate = nextPromotionDate.toISOString();
-
-      // Hitung hari sampai nextPromotionDate
-      const daysToNextPromotion = Math.ceil((nextPromotionDate - new Date()) / (1000 * 60 * 60 * 24));
-
-      return res.json({
-        message: `Employee with NIK ${nik}: ${name} has been working for at least 4 years.`,
-        hasWorkedForFourYears: true,
-        nextPromotionDate: formattedNextPromotionDate,
-        daysToNextPromotion: daysToNextPromotion,
-      });
-    } else {
-      // Hitung tanggal estimasi selesainya 4 tahun masa kerja
-      const estimatedCompletionDate = new Date();
-      estimatedCompletionDate.setDate(estimatedCompletionDate.getDate() + daysLeft);
-
-      // Format tanggal ke dalam format ISO 8601
-      const formattedEstimatedCompletionDate = estimatedCompletionDate.toISOString();
-
-      return res.json({
-        message: `Employee with NIK ${nik} will complete 4 years of service in ${daysLeft} days.`,
-        hasWorkedForFourYears: false,
-        daysLeftToFourYears: daysLeft,
-        estimatedCompletionDate: formattedEstimatedCompletionDate,
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Error occurred while fetching employee data." });
-  }
-};
-
 export const getUsersV2 = async (req, res) => {
   const page = parseInt(req.query.page) || 0;
   const limit = parseInt(req.query.limit) || 10;
@@ -276,12 +123,15 @@ export const getUsersV2 = async (req, res) => {
       const nextPromotionDate = new Date(tanggalMasukDate);
       nextPromotionDate.setFullYear(tanggalMasukDate.getFullYear() + (Math.floor(yearsOfService / 4) + 1) * 4);
 
+      // Format the date as YYYY-MM-DD
+      const formattedNextPromotionDate = nextPromotionDate.toISOString().split("T")[0];
+
       // Calculate days to the next promotion
       const daysToNextPromotion = Math.ceil((nextPromotionDate - today) / (1000 * 60 * 60 * 24));
 
       return {
         ...employeeData.toJSON(),
-        nextPromotionDate: nextPromotionDate.toISOString(),
+        nextPromotionDate: formattedNextPromotionDate,
         daysToNextPromotion,
       };
     });

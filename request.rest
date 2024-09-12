@@ -8,9 +8,6 @@ GET http://localhost:5000/api/get-employee-v2?search_query=c&page=0&limit=10
 GET http://localhost:5000/api/get-employee-v2?page=0&limit=10
 
 
-### get all data
-GET  http://localhost:5000/api/get-employee
-
 ### get all data v2
 GET http://localhost:5000/api/get-employee-v2
 
@@ -35,7 +32,7 @@ POST http://localhost:5000/api/employee/create
 Content-Type: application/json 
 
 {
-    "nik": "",
+    "nik": "121140041",
     "name": "test5",
     "tanggal_masuk": "2021-08-15",
     "pangkat": "C1",
@@ -58,5 +55,3 @@ Content-Type: application/json
 DELETE http://localhost:5000/api/employee/delete/8
 
 
-###
-GET http://localhost:5000/api/employees/3/work-experience
