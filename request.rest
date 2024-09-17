@@ -1,7 +1,5 @@
-GET http://localhost:5000/api/get-employee?search_query=c&page=0&limit=10
-
 ### get v2
-GET http://localhost:5000/api/get-employee-v2?search_query=c&page=0&limit=10
+GET http://localhost:5000/api/get-employee-v2?search_query=w&page=0&limit=10
 
 
 ###
@@ -16,13 +14,13 @@ PATCH http://localhost:5000/api/employee/edit/5
 Content-Type: application/json 
 
 {
-    "nik": "2",
-    "name": "Test Update",
-    "tanggal_masuk": "2018-08-15",
-    "pangkat": "A3",
+    "nik": "101243",
+    "name": "Marshanda",
+    "tanggal_masuk": "2024-02-07",
+    "pangkat": "B1",
     "jabatan": "Staff",
-    "academic_background": "SMP",
-    "nomor_telepon": "085566778899"
+    "academic_background": "SMA",
+    "nomor_telepon": "082233443322"
 }
 
 
@@ -32,11 +30,11 @@ POST http://localhost:5000/api/employee/create
 Content-Type: application/json 
 
 {
-    "nik": "121140041",
-    "name": "test5",
-    "tanggal_masuk": "2021-08-15",
+    "nik": "101242",
+    "name": "Andromeda",
+    "tanggal_masuk": "2024-02-07",
     "pangkat": "C1",
-    "jabatan": "Kasubag",
+    "jabatan": "Staff",
     "academic_background": "S1 Hukum",
     "nomor_telepon": "082233445511"
 }
@@ -52,6 +50,6 @@ Content-Type: application/json
 
 
 ###
-DELETE http://localhost:5000/api/employee/delete/8
+DELETE http://localhost:5000/api/employee/delete/101243
 
 

@@ -32,7 +32,7 @@ export const createUser = async (req, res) => {
   try {
     await employee.create(req.body);
     res.status(201).json({
-      msg: "User Created Success",
+      msg: "Data successfully added",
     });
   } catch (error) {
     console.log(error.message);
@@ -52,7 +52,7 @@ export const updateUser = async (req, res) => {
       },
     });
 
-    res.status(200).json({ message: "Employee updated successfully" });
+    res.status(200).json({ message: "Employee data updated successfully" });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: "Error updating employee" }); // Provide more specific error message
@@ -67,7 +67,7 @@ export const deleteUser = async (req, res) => {
         nik,
       },
     });
-    res.status(200).json({ msg: "User Deleted" });
+    res.status(200).json({ msg: "Successfully Delete Data" });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: `Error delete employee data` });
