@@ -1,5 +1,5 @@
 ### get v2
-GET http://localhost:5000/api/get-employee-v2?search_query=w&page=0&limit=10
+GET http://localhost:5000/api/get-employee-v2?search_query=andro&page=0&limit=10
 
 
 ###
